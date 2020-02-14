@@ -1,0 +1,19 @@
+{
+  "name": "safe-timeout",
+  "version": "1.0.0",
+  "description": "Guard against sleep mode timeouts firing on wake",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["timeout", "safe", "sleep", "hibernate"],
+  "author": "David Mark Clements (@davidmarkclem)",
+  "license": "MIT",
+  "engineStrict" : true,
+  "engines": {
+      "node": ">=10"
+  },
+  "devDependencies": {
+    "tap": "^14.10.6"
+  }
+}
