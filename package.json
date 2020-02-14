@@ -6,14 +6,28 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["timeout", "safe", "sleep", "hibernate"],
+  "keywords": [
+    "timeout",
+    "safe",
+    "sleep",
+    "hibernate"
+  ],
   "author": "David Mark Clements (@davidmarkclem)",
   "license": "MIT",
-  "engineStrict" : true,
+  "engineStrict": true,
   "engines": {
-      "node": ">=10"
+    "node": ">=10"
   },
   "devDependencies": {
     "tap": "^14.10.6"
-  }
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidmarkclements/safe-timeout.git"
+  },
+  "bugs": {
+    "url": "https://github.com/davidmarkclements/safe-timeout/issues"
+  },
+  "homepage": "https://github.com/davidmarkclements/safe-timeout#readme"
 }
