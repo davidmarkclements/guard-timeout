@@ -1,5 +1,6 @@
 'use strict'
 const customPromisify = require('util').promisify.custom
+const onTimeout = Symbol('safe-timeout')
 const maxInt = Math.pow(2, 31) - 1
 
 const defaults = {
@@ -36,6 +37,17 @@ function createSafeTimeout (opts = {}) {
       }
       fn(...args)
     }
+
+    timeout[onTimeout] = timeout._onTimeout
+    Object.defineProperty(timeout, '_onTimeout', {
+      get () {
+        return this[onTimeout]
+      },
+      set (v) {
+        if (v === null && this !== timeout) { clearTimeout(timeout) }
+        return (this[onTimeout] = v)
+      }
+    })
 
     return timeout
   }
