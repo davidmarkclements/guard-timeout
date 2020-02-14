@@ -4,12 +4,16 @@ const maxInt = Math.pow(2, 31) - 1
 
 const defaults = {
   lagMs: 1000,
+  rescheduler: (t) => t
 }
 
-function createSafeTimeout (opts = defaults) {
-  const { lagMs } = opts
+function createSafeTimeout (opts = {}) {
+  const { lagMs, rescheduler } = { ...defaults, ...opts }
   if (lagMs > maxInt) {
     throw Error('safe-timeout: lagMs must be (significantly) less than maxInt')
+  }
+  if (typeof rescheduler !== 'function') {
+    throw Error('safe-timeout: rescheduler must be a function')
   }
   function safeTimeout (fn, t, ...args) {
     const gaurdTime = t + lagMs
@@ -20,12 +24,13 @@ function createSafeTimeout (opts = defaults) {
     const unrefed = Object.getOwnPropertySymbols(timeout).find((s) => /unrefed/.test(s.toString())) 
     // v10
     const refed = Object.getOwnPropertySymbols(timeout).find((s) => /\(refed\)/.test(s.toString())) 
-    
+
     function handler (args) {
       if (Date.now() > maxLag) {
         const unref = timeout[unrefed] === true
         const ref = timeout[refed] === true
-        timeout = setTimeout(handler, t, ...args)
+        const rescheduledTime = rescheduler(t, timeout)
+        timeout = setTimeout(handler, rescheduledTime, ...args)
         if (unref || !ref) timeout.unref()
         return
       }
@@ -38,6 +43,7 @@ function createSafeTimeout (opts = defaults) {
   safeTimeout[customPromisify] = (t) => {
     const promise = new Promise((r) => {
       const timeout = safeTimeout(r, t)
+      promise.timeout = timeout
       return timeout
     })
     return promise

@@ -68,18 +68,19 @@ run().catch(console.error)
 
 ## API
 
-### `require('safe-timeout') => setTimeout (cb, time, ...args) => {}`
+### `require('safe-timeout') => setTimeout (cb, time, ...args) => timeoutInstance`
 
 The default export of `safe-timeout` a is safe `setTimeout` function with a 
 default `lagMs` option of 1000 (one second).
 
-### `require('safe-timeout').create(opts) => setTimeout (cb, time, ...args) => {}`
+### `require('safe-timeout').create(opts) => setTimeout (cb, time, ...args) => timeoutInstance`
 
 Create a custom safe `setTimeout` function by passing in options
 
 #### Options
 
-*  `lagMs` – the allowable delta between when a timeout should fire and when it actually fires, in milliseconds. If this is exceeded then the timeout is rescheduled.
+*  `lagMs` – `Number`, default: 1000. The allowable delta between when a timeout should fire and when it actually fires, in milliseconds. If this is exceeded then the timeout is rescheduled.
+* `rescheduler` - `Function`, default: `(t, instance) => t`. A mapping function to calculate when the timeout should be rescheduled for. It takes two args, the time that the timeout was scheduled for and the timeout instance returned from `safe-timeout` (which comes Node's native `setTimeout`). The `instance` argument can be used to apply specific reschedule times to specific timeouts. The return value should be a number representing milliseconds for the rescheduled timeout. 
 
 
 ## Contributing
