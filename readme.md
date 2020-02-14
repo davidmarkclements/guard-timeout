@@ -4,7 +4,7 @@
 
 ## About
 
-If a process goes into a sleep mode (for instance a laptop hibernates, or a service is out into inspect mode) then timeouts will trigger on wake. Depending on your use case (think distributed systems) you might not want to trigger a timeout if process uptime hasn't actually occurred in that period. 
+If a process goes into a sleep mode (for instance a laptop hibernates, or a service is put into inspect mode) then timeouts may trigger on wake. Depending on your use case (think distributed systems) you might not want to trigger a timeout if process uptime hasn't actually occurred in that period. 
 
 The `safe-timeout` module will check if there is a significant lag (default 1s) between when the timeout 
 was scheduled to fire and when it actually fired. 
@@ -22,7 +22,7 @@ $ npm i safe-timeout
 const setTimeout = require('safe-timeout')
 
 // if the timeout is 1 second late, 
-// it will be reschedule it for another 20 minutes
+// it will be reschedule for another 20 minutes
 
 setTimeout(
   () => { console.log('do something') }, 
@@ -40,7 +40,7 @@ const setTimeout = require('safe-timeout').create({
 })
 
 // if the timeout is 1 minute late, 
-// it will be reschedule it for another 20 minutes
+// it will be reschedule for another 20 minutes
 
 setTimeout(
   () => { console.log('do something') }, 
@@ -58,7 +58,7 @@ const timeout = promisify(require('safe-timeout'))
 
 async function run () {
   // if the timeout is 1 second late, 
-  // it will be reschedule it for another 20 minutes
+  // it will be reschedule for another 20 minutes
   await timeout(1.2e+6) // 20 minutes
   console.log('do something')
 }
