@@ -1,6 +1,6 @@
 'use strict'
 const customPromisify = require('util').promisify.custom
-const onTimeout = Symbol('safe-timeout')
+const onTimeout = Symbol('guard-timeout')
 const maxInt = Math.pow(2, 31) - 1
 
 const defaults = {
@@ -11,12 +11,12 @@ const defaults = {
 function createSafeTimeout (opts = {}) {
   const { lagMs, rescheduler } = { ...defaults, ...opts }
   if (lagMs > maxInt) {
-    throw Error('safe-timeout: lagMs must be (significantly) less than maxInt')
+    throw Error('guard-timeout: lagMs must be (significantly) less than maxInt')
   }
   if (typeof rescheduler !== 'function') {
-    throw Error('safe-timeout: rescheduler must be a function')
+    throw Error('guard-timeout: rescheduler must be a function')
   }
-  function safeTimeout (fn, t, ...args) {
+  function guardTimeout (fn, t, ...args) {
     const gaurdTime = t + lagMs
     let maxLag = Date.now() + gaurdTime
     let timeout = setTimeout(handler, t, ...args)
@@ -56,9 +56,9 @@ function createSafeTimeout (opts = {}) {
     return timeout
   }
 
-  safeTimeout[customPromisify] = (t) => {
+  guardTimeout[customPromisify] = (t) => {
     let r = null
-    const timeout = safeTimeout(() => {
+    const timeout = guardTimeout(() => {
       r()
     }, t)
     const promise = new Promise((resolve) => {
@@ -69,10 +69,10 @@ function createSafeTimeout (opts = {}) {
     return promise
   }
 
-  return safeTimeout
+  return guardTimeout
 }
 
-const safeTimeout = createSafeTimeout()
-safeTimeout.create = createSafeTimeout
+const guardTimeout = createSafeTimeout()
+guardTimeout.create = createSafeTimeout
 
-module.exports = safeTimeout
+module.exports = guardTimeout

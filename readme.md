@@ -1,4 +1,4 @@
-# safe-timeout
+# guard-timeout
 
 > Guard against sleep mode timeouts firing on wake
 
@@ -6,20 +6,20 @@
 
 If a process goes into a sleep mode (for instance a laptop hibernates, or a service is put into inspect mode) then timeouts may trigger on wake. Depending on your use case (think distributed systems) you might not want to trigger a timeout if process uptime hasn't actually occurred in that period. 
 
-The `safe-timeout` module will check if there is a significant lag (default 1s) between when the timeout 
+The `guard-timeout` module will check if there is a significant lag (default 1s) between when the timeout 
 was scheduled to fire and when it actually fired. 
 
 
 ## Install
 
 ```sh
-$ npm i safe-timeout
+$ npm i guard-timeout
 ```
 
 ## Usage
 
 ```js
-const setTimeout = require('safe-timeout')
+const setTimeout = require('guard-timeout')
 
 // if the timeout is 1 second late, 
 // it will be reschedule for another 20 minutes
@@ -35,7 +35,7 @@ setTimeout(
 Configure your own safe timeout: 
 
 ```js
-const setTimeout = require('safe-timeout').create({
+const setTimeout = require('guard-timeout').create({
   lagMs: 60 * 1000 // 1 minute lag
 })
 
@@ -50,11 +50,11 @@ setTimeout(
 
 ## Await Usage
 
-`safe-timeout` has [`util.promisify`](https://nodejs.org/dist/latest-v8.x/docs/api/util.html#util_util_promisify_original) support: 
+`guard-timeout` has [`util.promisify`](https://nodejs.org/dist/latest-v8.x/docs/api/util.html#util_util_promisify_original) support: 
 
 ```js
 const { promisify } = require('util')
-const timeout = promisify(require('safe-timeout'))
+const timeout = promisify(require('guard-timeout'))
 
 async function run () {
   // if the timeout is 1 second late, 
@@ -68,24 +68,24 @@ run().catch(console.error)
 
 ## API
 
-### `require('safe-timeout') => setTimeout (cb, time, ...args) => timeoutInstance`
+### `require('guard-timeout') => setTimeout (cb, time, ...args) => timeoutInstance`
 
-The default export of `safe-timeout` a is safe `setTimeout` function with a 
+The default export of `guard-timeout` a is safe `setTimeout` function with a 
 default `lagMs` option of 1000 (one second).
 
-### `require('safe-timeout').create(opts) => setTimeout (cb, time, ...args) => timeoutInstance`
+### `require('guard-timeout').create(opts) => setTimeout (cb, time, ...args) => timeoutInstance`
 
 Create a custom safe `setTimeout` function by passing in options
 
 #### Options
 
 *  `lagMs` – `Number`, default: 1000. The allowable delta between when a timeout should fire and when it actually fires, in milliseconds. If this is exceeded then the timeout is rescheduled.
-* `rescheduler` - `Function`, default: `(t, instance) => t`. A mapping function to calculate when the timeout should be rescheduled for. It takes two args, the time that the timeout was scheduled for and the timeout instance returned from `safe-timeout` (which comes Node's native `setTimeout`). The `instance` argument can be used to apply specific reschedule times to specific timeouts. The return value should be a number representing milliseconds for the rescheduled timeout. 
+* `rescheduler` - `Function`, default: `(t, instance) => t`. A mapping function to calculate when the timeout should be rescheduled for. It takes two args, the time that the timeout was scheduled for and the timeout instance returned from `guard-timeout` (which comes Node's native `setTimeout`). The `instance` argument can be used to apply specific reschedule times to specific timeouts. The return value should be a number representing milliseconds for the rescheduled timeout. 
 
 
 ## Contributing
 
-Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/David%20Mark%20Clements/safe-timeout/issues)
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/David%20Mark%20Clements/guard-timeout/issues)
 
 ## Author
 

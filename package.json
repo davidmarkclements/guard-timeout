@@ -1,5 +1,5 @@
 {
-  "name": "safe-timeout",
+  "name": "guard-timeout",
   "version": "1.0.0",
   "description": "Guard against sleep mode timeouts firing on wake",
   "main": "index.js",
@@ -26,10 +26,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davidmarkclements/safe-timeout.git"
+    "url": "git+https://github.com/davidmarkclements/guard-timeout.git"
   },
   "bugs": {
-    "url": "https://github.com/davidmarkclements/safe-timeout/issues"
+    "url": "https://github.com/davidmarkclements/guard-timeout/issues"
   },
-  "homepage": "https://github.com/davidmarkclements/safe-timeout#readme"
+  "homepage": "https://github.com/davidmarkclements/guard-timeout#readme"
 }

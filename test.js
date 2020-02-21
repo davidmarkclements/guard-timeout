@@ -1,7 +1,7 @@
 'use strict'
 const { promisify } = require('util')
 const { test } = require('tap')
-const safeTimeout = require('.')
+const guardTimeout = require('.')
 
 const lag = (ms) => {
   const start = Date.now()
@@ -16,7 +16,7 @@ test('schedules a new timeout if timeout triggers after default lagMs time', ({ 
     ok(delta >= 100)
     ok(delta < 2000)
   }, 100)
-  safeTimeout(() => {
+  guardTimeout(() => {
     const now = Date.now()
     const delta = now - start
     ok(delta >= 1100)
@@ -25,8 +25,8 @@ test('schedules a new timeout if timeout triggers after default lagMs time', ({ 
   lag(1150)
 })
 
-test('create safeTimeout, custom lagMs', ({ ok, end }) => {
-  const customSafeTimeout = safeTimeout.create({ lagMs: 500 })
+test('create guardTimeout, custom lagMs', ({ ok, end }) => {
+  const customguardTimeout = guardTimeout.create({ lagMs: 500 })
   const start = Date.now()
   setTimeout(() => {
     const now = Date.now()
@@ -34,7 +34,7 @@ test('create safeTimeout, custom lagMs', ({ ok, end }) => {
     ok(delta >= 100)
     ok(delta < 720)
   }, 100)
-  customSafeTimeout(() => {
+  customguardTimeout(() => {
     const now = Date.now()
     const delta = now - start
     ok(delta >= 600)
@@ -44,9 +44,9 @@ test('create safeTimeout, custom lagMs', ({ ok, end }) => {
   lag(600)
 })
 
-test('create safeTimeout, custom rescheduler', ({ ok, plan }) => {
+test('create guardTimeout, custom rescheduler', ({ ok, plan }) => {
   plan(5)
-  const customSafeTimeout = safeTimeout.create({
+  const customguardTimeout = guardTimeout.create({
     lagMs: 500,
     rescheduler: (t, tInst) => {
       ok(tInst === instance)
@@ -60,7 +60,7 @@ test('create safeTimeout, custom rescheduler', ({ ok, plan }) => {
     ok(delta >= 100)
     ok(delta < 720)
   }, 100)
-  const instance = customSafeTimeout(() => {
+  const instance = customguardTimeout(() => {
     const now = Date.now()
     const delta = now - start
     ok(delta >= 150)
@@ -81,8 +81,8 @@ test('clearTimeout works even when timeout is rescheduled', ({ ok, end, fail }) 
     }, 0)
     setTimeout(end, 2000) // give safe timeout time to refire
   }, 100)
-  const instance = safeTimeout(() => {
-    fail('safeTimeout should not fire')
+  const instance = guardTimeout(() => {
+    fail('guardTimeout should not fire')
   }, 100)
   lag(1150)
 })
@@ -95,7 +95,7 @@ test('promisified safe timeout', ({ ok, end }) => {
     ok(delta >= 100)
     ok(delta < 2000)
   }, 100)
-  const safe = promisify(safeTimeout)
+  const safe = promisify(guardTimeout)
   const p = safe(100)
   p.then(() => {
     const now = Date.now()
