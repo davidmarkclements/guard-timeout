@@ -4,7 +4,10 @@
   "description": "Guard against sleep mode timeouts firing on wake",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "tap -R classic",
+    "cov": "npm test -- --coverage-report=html",
+    "lint": "standard",
+    "ci": "npm run lint && npm test"
   },
   "keywords": [
     "timeout",
@@ -21,7 +24,6 @@
   "devDependencies": {
     "tap": "^14.10.6"
   },
-  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/davidmarkclements/safe-timeout.git"

@@ -18,21 +18,23 @@ function createSafeTimeout (opts = {}) {
   }
   function safeTimeout (fn, t, ...args) {
     const gaurdTime = t + lagMs
-    const maxLag = Date.now() + gaurdTime
-
+    let maxLag = Date.now() + gaurdTime
     let timeout = setTimeout(handler, t, ...args)
-    // v12
-    const unrefed = Object.getOwnPropertySymbols(timeout).find((s) => /unrefed/.test(s.toString())) 
     // v10
-    const refed = Object.getOwnPropertySymbols(timeout).find((s) => /\(refed\)/.test(s.toString())) 
+    const unrefed = Object.getOwnPropertySymbols(timeout).find((s) => /unrefed/.test(s.toString()))
+    // v12
+    const refed = Object.getOwnPropertySymbols(timeout).find((s) => /\(refed\)/.test(s.toString()))
 
-    function handler (args) {
+    function handler (args = []) {
       if (Date.now() > maxLag) {
+        maxLag = Date.now() + gaurdTime
         const unref = timeout[unrefed] === true
-        const ref = timeout[refed] === true
+        const ref = refed in timeout ? timeout[refed] === true : true
         const rescheduledTime = rescheduler(t, timeout)
         timeout = setTimeout(handler, rescheduledTime, ...args)
-        if (unref || !ref) timeout.unref()
+        if (unref || !ref) {
+          timeout.unref()
+        }
         return
       }
       fn(...args)
@@ -44,7 +46,9 @@ function createSafeTimeout (opts = {}) {
         return this[onTimeout]
       },
       set (v) {
-        if (v === null && this !== timeout) { clearTimeout(timeout) }
+        if (v === null && this !== timeout) {
+          clearTimeout(timeout)
+        }
         return (this[onTimeout] = v)
       }
     })
@@ -53,11 +57,15 @@ function createSafeTimeout (opts = {}) {
   }
 
   safeTimeout[customPromisify] = (t) => {
-    const promise = new Promise((r) => {
-      const timeout = safeTimeout(r, t)
-      promise.timeout = timeout
+    let r = null
+    const timeout = safeTimeout(() => {
+      r()
+    }, t)
+    const promise = new Promise((resolve) => {
+      r = resolve
       return timeout
     })
+    promise.timeout = timeout
     return promise
   }
 
