@@ -1,6 +1,6 @@
 {
   "name": "guard-timeout",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Guard against sleep mode timeouts firing on wake",
   "main": "index.js",
   "browser": {
