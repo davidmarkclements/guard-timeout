@@ -1,6 +1,7 @@
 'use strict'
+
 const { promisify } = require('util')
-const { test } = require('tap')
+const test = require('tape')
 const guardTimeout = require('.')
 
 const lag = (ms) => {
@@ -66,7 +67,7 @@ test('create guardTimeout, custom rescheduler', ({ ok, plan }) => {
     ok(delta >= 150)
     ok(delta < 720)
   }, 100)
-  lag(600)
+  lag(700)
 })
 
 test('clearTimeout works even when timeout is rescheduled', ({ ok, end, fail }) => {

@@ -19,7 +19,7 @@ function createSafeTimeout (opts = {}) {
   function guardTimeout (fn, t, ...args) {
     const gaurdTime = t + lagMs
     let maxLag = Date.now() + gaurdTime
-    let timeout = setTimeout(handler, t, ...args)
+    let timeout = bWrap(setTimeout(handler, t, ...args))
     // v10
     const unrefed = Object.getOwnPropertySymbols(timeout).find((s) => /unrefed/.test(s.toString()))
     // v12
@@ -31,7 +31,8 @@ function createSafeTimeout (opts = {}) {
         const unref = timeout[unrefed] === true
         const ref = refed in timeout ? timeout[refed] === true : true
         const rescheduledTime = rescheduler(t, timeout)
-        timeout = setTimeout(handler, rescheduledTime, ...args)
+        timeout = bWrap(setTimeout(handler, rescheduledTime, ...args), timeout)
+        if (typeof timeout === 'number') timeout = { id: timeout, valueOf () { return this.id } }
         if (unref || !ref) {
           timeout.unref()
         }
@@ -74,5 +75,28 @@ function createSafeTimeout (opts = {}) {
 
 const guardTimeout = createSafeTimeout()
 guardTimeout.create = createSafeTimeout
+
+function bWrap (timeout, prior) {
+  if (typeof timeout === 'number') {
+    if (prior) {
+      prior.priors = prior.priors || []
+      prior.priors.push(prior.id)
+      prior.id = timeout
+      return prior
+    }
+    return {
+      id: timeout,
+      priors: null,
+      valueOf () {
+        if (this.priors !== null) {
+          console.log('CLEAR PRIORS', this.priors)
+          this.priors.forEach(clearTimeout)
+        }
+        return this.id
+      }
+    }
+  }
+  return timeout
+}
 
 module.exports = guardTimeout
