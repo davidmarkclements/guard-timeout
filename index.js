@@ -89,7 +89,6 @@ function bWrap (timeout, prior) {
       priors: null,
       valueOf () {
         if (this.priors !== null) {
-          console.log('CLEAR PRIORS', this.priors)
           this.priors.forEach(clearTimeout)
         }
         return this.id
