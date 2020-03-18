@@ -1,6 +1,5 @@
 'use strict'
 const customPromisify = require('util').promisify.custom
-const onTimeout = Symbol('guard-timeout')
 const maxInt = Math.pow(2, 31) - 1
 
 const defaults = {
@@ -19,42 +18,26 @@ function createSafeTimeout (opts = {}) {
   function guardTimeout (fn, t, ...args) {
     const gaurdTime = t + lagMs
     let maxLag = Date.now() + gaurdTime
-    let timeout = bWrap(setTimeout(handler, t, ...args))
-    // v10
-    const unrefed = Object.getOwnPropertySymbols(timeout).find((s) => /unrefed/.test(s.toString()))
-    // v12
-    const refed = Object.getOwnPropertySymbols(timeout).find((s) => /\(refed\)/.test(s.toString()))
+    let timeout = setTimeout(handler, t, ...args)
 
     function handler (args = []) {
       if (Date.now() > maxLag) {
         maxLag = Date.now() + gaurdTime
-        const unref = timeout[unrefed] === true
-        const ref = refed in timeout ? timeout[refed] === true : true
-        const rescheduledTime = rescheduler(t, timeout)
-        timeout = bWrap(setTimeout(handler, rescheduledTime, ...args), timeout)
-        if (typeof timeout === 'number') timeout = { id: timeout, valueOf () { return this.id } }
-        if (unref || !ref) {
-          timeout.unref()
-        }
+        const rescheduledTime = rescheduler(t, instance)
+        timeout = setTimeout(handler, rescheduledTime, ...args)
         return
       }
       fn(...args)
     }
 
-    timeout[onTimeout] = timeout._onTimeout
-    Object.defineProperty(timeout, '_onTimeout', {
-      get () {
-        return this[onTimeout]
-      },
-      set (v) {
-        if (v === null && this !== timeout) {
-          clearTimeout(timeout)
-        }
-        return (this[onTimeout] = v)
+    const instance = {
+      get timeout () { return timeout },
+      close () {
+        clearTimeout(this.timeout)
       }
-    })
+    }
 
-    return timeout
+    return instance
   }
 
   guardTimeout[customPromisify] = (t) => {
@@ -75,27 +58,5 @@ function createSafeTimeout (opts = {}) {
 
 const guardTimeout = createSafeTimeout()
 guardTimeout.create = createSafeTimeout
-
-function bWrap (timeout, prior) {
-  if (typeof timeout === 'number') {
-    if (prior) {
-      prior.priors = prior.priors || []
-      prior.priors.push(prior.id)
-      prior.id = timeout
-      return prior
-    }
-    return {
-      id: timeout,
-      priors: null,
-      valueOf () {
-        if (this.priors !== null) {
-          this.priors.forEach(clearTimeout)
-        }
-        return this.id
-      }
-    }
-  }
-  return timeout
-}
 
 module.exports = guardTimeout

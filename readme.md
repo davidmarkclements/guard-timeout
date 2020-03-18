@@ -68,14 +68,24 @@ run().catch(console.error)
 
 ## API
 
-### `require('guard-timeout') => setTimeout (cb, time, ...args) => timeoutInstance`
+### `require('guard-timeout') => setTimeout (cb, time, ...args) => instance`
 
 The default export of `guard-timeout` a is safe `setTimeout` function with a 
 default `lagMs` option of 1000 (one second).
 
-### `require('guard-timeout').create(opts) => setTimeout (cb, time, ...args) => timeoutInstance`
+### `require('guard-timeout').create(opts) => setTimeout (cb, time, ...args) => instance`
 
 Create a custom safe `setTimeout` function by passing in options
+
+### `instance.close()`
+
+Clears the timeout
+
+### `instance.timeout`
+
+A getter property which holds current underlying timeout object (or numerical ID in the browser).
+
+
 
 #### Options
 

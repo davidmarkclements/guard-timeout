@@ -2,12 +2,8 @@
 
 const { promisify } = require('util')
 const test = require('tape')
-const guardTimeout = require('.')
-
-const lag = (ms) => {
-  const start = Date.now()
-  while (start + ms > Date.now()) {}
-}
+const guardTimeout = require('..')
+const lag = require('atomic-sleep')
 
 test('schedules a new timeout if timeout triggers after default lagMs time', ({ ok, end }) => {
   const start = Date.now()
@@ -70,7 +66,7 @@ test('create guardTimeout, custom rescheduler', ({ ok, plan }) => {
   lag(700)
 })
 
-test('clearTimeout works even when timeout is rescheduled', ({ ok, end, fail }) => {
+test('close method', ({ ok, end, fail }) => {
   const start = Date.now()
   setTimeout(() => {
     const now = Date.now()
@@ -78,7 +74,7 @@ test('clearTimeout works even when timeout is rescheduled', ({ ok, end, fail }) 
     ok(delta >= 100)
     ok(delta < 2000)
     setTimeout(() => {
-      clearTimeout(instance)
+      instance.close()
     }, 0)
     setTimeout(end, 2000) // give safe timeout time to refire
   }, 100)
